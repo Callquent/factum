@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  invoices Invoice[]
+}
+
+model Invoice {
+  id        Int      @id @default(autoincrement())
+  companyId Int
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  amount    Float
+  date      DateTime?
+  reference String?
+  source    String   @default("manual") // pdf | ocr | manual
+  fileName  String?  // nom d'origine du fichier conservé
+  fileType  String?
+  filePath  String?  // anciens fichiers stockés dans ./storage (avant la mise à jour)
+  fileData  Bytes?   // contenu du fichier, stocké dans la base
+  createdAt DateTime @default(now())
+}
